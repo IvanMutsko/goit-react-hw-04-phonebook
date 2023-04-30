@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import { formatterNumber } from '../utils/formatterNumber';
 import ContactForm from './ContactForm/ContactForm';
@@ -12,32 +12,21 @@ const initialContacts = [
   { id: nanoid(), name: 'Annie Copeland', number: '227-91-26' },
 ];
 
-class App extends Component {
-  state = {
-    contacts: [],
-    filter: '',
-  };
+export const App = () => {
+  const [contacts, setContacts] = useState(
+    () => JSON.parse(window.localStorage.getItem('contacts')) ?? initialContacts
+  );
 
-  componentDidMount() {
-    const contactsFromStorage = JSON.parse(localStorage.getItem('contacts'));
+  const [filter, setFilter] = useState('');
 
-    if (contactsFromStorage) {
-      this.setState({ contacts: contactsFromStorage });
-      return;
-    }
-    this.setState({ contacts: initialContacts });
-  }
+  useEffect(() => {
+    window.localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.contacts !== prevState.contacts) {
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-    }
-  }
-
-  onAddContact = data => {
+  const onAddContact = data => {
     const { name, number } = data;
 
-    const isContainName = this.state.contacts.some(
+    const isContainName = contacts.some(
       contactName =>
         contactName.name.toLocaleLowerCase() === name.toLocaleLowerCase()
     );
@@ -46,69 +35,57 @@ class App extends Component {
       alert(`${name} is already in contacts.`);
       return;
     }
-    this.setState(prevState => {
-      const newContactList = [...prevState.contacts];
+
+    setContacts(contacts => {
+      const newContactList = [...contacts];
 
       newContactList.push({
         id: nanoid(),
         name: name,
         number: formatterNumber(number),
       });
-      return { contacts: newContactList };
+      return newContactList;
     });
   };
 
-  deleteContact = id => {
-    this.setState(prevState => ({
-      contacts: prevState.contacts.filter(contact => contact.id !== id),
-    }));
+  const deleteContact = id => {
+    setContacts(contacts.filter(contact => contact.id !== id));
   };
 
-  onChangeFilterInput = evt => {
+  const onChangeFilterInput = evt => {
     const { value } = evt.currentTarget;
 
-    this.setState({
-      filter: value,
-    });
+    setFilter(value);
   };
 
-  filteredContactsList = () => {
-    const { contacts, filter } = this.state;
-
-    const filteredContacts = contacts.filter(contact =>
+  const filteredContactsList = (contacts, filter) => {
+    return contacts.filter(contact =>
       contact.name.toLowerCase().includes(filter.toLowerCase())
     );
-
-    return filteredContacts;
   };
 
-  render() {
-    return (
-      <>
-        <div>
-          <h1>Phonebook</h1>
-          <ContactForm onAddContact={this.onAddContact} />
+  return (
+    <>
+      <div>
+        <h1>Phonebook</h1>
+        <ContactForm onAddContact={onAddContact} />
 
-          <h2>Contacts</h2>
+        <h2>Contacts</h2>
 
-          {this.state.contacts.length === 0 ? (
-            <p>
-              Sorry, but you don't have any contacts yet. Add your first
-              contact.
-            </p>
-          ) : (
-            <>
-              <Filter onChangeFilterInput={this.onChangeFilterInput} />
-              <ContactList
-                contacts={this.filteredContactsList()}
-                onDeleteContact={this.deleteContact}
-              />
-            </>
-          )}
-        </div>
-      </>
-    );
-  }
-}
-
-export default App;
+        {contacts.length === 0 ? (
+          <p>
+            Sorry, but you don't have any contacts yet. Add your first contact.
+          </p>
+        ) : (
+          <>
+            <Filter onChangeFilterInput={onChangeFilterInput} />
+            <ContactList
+              contacts={filteredContactsList(contacts, filter)}
+              onDeleteContact={deleteContact}
+            />
+          </>
+        )}
+      </div>
+    </>
+  );
+};

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+// import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -20,44 +20,50 @@ const schema = yup.object().shape({
 
 const initialValues = { name: '', number: '' };
 
-class ContactForm extends Component {
-  state = {
-    name: '',
-    number: '',
-  };
+const ContactForm = ({ onAddContact }) => {
+  // const [name, setName] = useState('');
+  // const [number, setNumber] = useState('');
 
-  onChangeInput = evt => {
-    const { name, number } = evt.currentTarget;
+  // const onChangeInput = evt => {
+  //   const { name, number } = evt.currentTarget;
 
-    this.setState({ name: name.value, number: number.value });
-  };
+  //   switch (name) {
+  //     case 'name':
+  //       setName(name);
+  //       break;
+  //     case 'number':
+  //       setNumber(number);
+  //       break;
+  //     default:
+  //       return;
+  //   }
+  // };
 
-  onSubmitForm = (values, { resetForm }) => {
-    this.props.onAddContact(this.state);
+  const onSubmitForm = (values, { resetForm }) => {
+    onAddContact(values);
 
     resetForm();
   };
 
-  render() {
-    return (
-      <Formik
-        initialValues={initialValues}
-        validationSchema={schema}
-        onSubmit={this.onSubmitForm}
-      >
-        <FormElement autoComplete="off" onChange={this.onChangeInput}>
-          <FieldTitle htmlFor="name-input">Name</FieldTitle>
-          <FieldElement id="name-input" type="text" name="name" />
-          <ErrorMessageElement name="name" component="div" />
-          <FieldTitle htmlFor="number-input">Number</FieldTitle>
-          <FieldElement id="number-input" type="tel" name="number" />
-          <ErrorMessageElement name="number" component="div" />
-          <AddBtn type="submit">Add contact</AddBtn>
-        </FormElement>
-      </Formik>
-    );
-  }
-}
+  return (
+    <Formik
+      initialValues={initialValues}
+      validationSchema={schema}
+      onSubmit={onSubmitForm}
+    >
+      {/* <FormElement autoComplete="off" onChange={onChangeInput}> */}
+      <FormElement autoComplete="off">
+        <FieldTitle htmlFor="name-input">Name</FieldTitle>
+        <FieldElement id="name-input" type="text" name="name" />
+        <ErrorMessageElement name="name" component="div" />
+        <FieldTitle htmlFor="number-input">Number</FieldTitle>
+        <FieldElement id="number-input" type="tel" name="number" />
+        <ErrorMessageElement name="number" component="div" />
+        <AddBtn type="submit">Add contact</AddBtn>
+      </FormElement>
+    </Formik>
+  );
+};
 
 export default ContactForm;
 
