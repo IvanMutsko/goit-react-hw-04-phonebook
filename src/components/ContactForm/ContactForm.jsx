@@ -1,4 +1,3 @@
-// import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Formik } from 'formik';
 import * as yup from 'yup';
@@ -21,24 +20,6 @@ const schema = yup.object().shape({
 const initialValues = { name: '', number: '' };
 
 const ContactForm = ({ onAddContact }) => {
-  // const [name, setName] = useState('');
-  // const [number, setNumber] = useState('');
-
-  // const onChangeInput = evt => {
-  //   const { name, number } = evt.currentTarget;
-
-  //   switch (name) {
-  //     case 'name':
-  //       setName(name);
-  //       break;
-  //     case 'number':
-  //       setNumber(number);
-  //       break;
-  //     default:
-  //       return;
-  //   }
-  // };
-
   const onSubmitForm = (values, { resetForm }) => {
     onAddContact(values);
 
@@ -51,7 +32,6 @@ const ContactForm = ({ onAddContact }) => {
       validationSchema={schema}
       onSubmit={onSubmitForm}
     >
-      {/* <FormElement autoComplete="off" onChange={onChangeInput}> */}
       <FormElement autoComplete="off">
         <FieldTitle htmlFor="name-input">Name</FieldTitle>
         <FieldElement id="name-input" type="text" name="name" />
